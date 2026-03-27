@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+.venv-wsl/
+venv/
+env/
+
+# Environment files (never commit secrets)
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Flask
+instance/
+.webassets-cache
+
+# Logs and runtime
+*.log
+*.pid
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build/test caches
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+project-files
