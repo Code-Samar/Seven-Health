@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard">
+  <div class="dash-header">
+    <div>
+      <p class="dash-greeting">Medical Records</p>
+      <h1 class="dash-name">Patient History</h1>
+    </div>
+  </div>
+
+  <div class="section-block">
+    {% if records %}
+      {% for r in records %}
+      <div class="history-card">
+        <div class="history-card-head">
+          <div>
+            <span class="history-date"><i class="bi bi-calendar3"></i> {{ r.date }}</span>
+            <span class="history-doctor"><i class="bi bi-person-badge"></i> Dr. {{ r.doctor.name }}</span>
+          </div>
+          <span class="badge-status badge-done">Completed</span>
+        </div>
+        {% if r.diagnosis %}
+        <div class="history-detail">
+          <span class="detail-label"><i class="bi bi-clipboard2-pulse"></i> Diagnosis</span>
+          <p class="detail-text">{{ r.diagnosis }}</p>
+        </div>
+        {% endif %}
+        {% if r.prescription %}
+        <div class="history-detail">
+          <span class="detail-label"><i class="bi bi-capsule"></i> Prescription</span>
+          <p class="detail-text">{{ r.prescription }}</p>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-clipboard-x"></i>
+        <p>No medical records found</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

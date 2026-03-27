@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard" id="adminDash">
+  <div class="dash-header">
+    <div>
+      <p class="dash-greeting">Administration</p>
+      <h1 class="dash-name">Control Panel</h1>
+    </div>
+    <a href="{{ url_for('admin_create_doctor') }}" class="dash-cta">
+      <i class="bi bi-person-plus"></i> Add Doctor
+    </a>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card stat-blue">
+      <i class="bi bi-person-badge stat-icon"></i>
+      <div class="stat-val">{{ doctors|length }}</div>
+      <div class="stat-lbl">Doctors</div>
+    </div>
+    <div class="stat-card stat-green">
+      <i class="bi bi-people stat-icon"></i>
+      <div class="stat-val">{{ patients|length }}</div>
+      <div class="stat-lbl">Patients</div>
+    </div>
+    <div class="stat-card stat-purple">
+      <i class="bi bi-calendar-range stat-icon"></i>
+      <div class="stat-val">{{ appointments|length }}</div>
+      <div class="stat-lbl">Total Appts</div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h3 class="section-title"><i class="bi bi-person-badge"></i> Doctors</h3>
+    <div class="table-wrap">
+      <table class="hms-table">
+        <thead><tr><th>Name</th><th>Username</th><th>Specialization</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for doc in doctors %}
+          <tr>
+            <td><strong>{{ doc.name }}</strong></td>
+            <td><span class="muted-text">@{{ doc.username }}</span></td>
+            <td><span class="spec-chip">{{ doc.specialization }}</span></td>
+            <td>
+              <div class="action-group">
+                <a href="{{ url_for('admin_edit_doctor', doc_id=doc.id) }}" class="btn-edit">
+                  <i class="bi bi-pencil"></i> Edit
+                </a>
+                <form method="post" action="{{ url_for('admin_delete_doctor', doc_id=doc.id) }}" style="display:inline;">
+                  <button class="btn-cancel" onclick="return confirm('Delete Dr. {{ doc.name }}?')">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h3 class="section-title"><i class="bi bi-people"></i> Patients</h3>
+    <div class="patient-grid">
+      {% for p in patients %}
+      <div class="patient-pill">
+        <i class="bi bi-person-circle"></i>
+        <span>{{ p.name }}</span>
+        <a href="{{ url_for('view_patient_history', patient_id=p.id) }}" class="pill-link">History</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h3 class="section-title"><i class="bi bi-calendar-range"></i> All Appointments</h3>
+    <div class="table-wrap">
+      <table class="hms-table">
+        <thead>
+          <tr><th>#</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for a in appointments %}
+          <tr>
+            <td><span class="id-badge">{{ a.id }}</span></td>
+            <td>{{ a.patient.name }}</td>
+            <td>Dr. {{ a.doctor.name }}</td>
+            <td>{{ a.date }}</td>
+            <td><span class="time-chip">{{ a.time }}</span></td>
+            <td>
+              <span class="badge-status {% if a.status == 'completed' %}badge-done{% elif a.status == 'cancelled' %}badge-cancel{% else %}badge-upcoming{% endif %}">
+                {{ a.status|capitalize }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card" id="loginApp">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <i class="bi bi-heart-pulse-fill"></i>
+      </div>
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-subtitle">Sign in to Seven Health</p>
+    </div>
+    <form method="post" class="auth-form">
+      {{ form.hidden_tag() }}
+      <div class="field-group">
+        <label class="field-label">{{ form.username.label.text }}</label>
+        <div class="field-wrap">
+          <i class="bi bi-person field-icon"></i>
+          {{ form.username(class="field-input", placeholder="Enter username") }}
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">{{ form.password.label.text }}</label>
+        <div class="field-wrap">
+          <i class="bi bi-lock field-icon"></i>
+          {{ form.password(class="field-input", placeholder="Enter password") }}
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">Sign In <i class="bi bi-arrow-right"></i></button>
+    </form>
+    <p class="auth-footer">New patient? <a href="{{ url_for('register') }}">Create account</a></p>
+  </div>
+</div>
+{% endblock %}

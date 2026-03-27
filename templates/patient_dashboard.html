@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard" id="patientDash">
+  <div class="dash-header">
+    <div>
+      <p class="dash-greeting">Good day,</p>
+      <h1 class="dash-name">{{ current_user.name }}</h1>
+    </div>
+    <a href="{{ url_for('patient_book') }}" class="dash-cta">
+      <i class="bi bi-calendar-plus"></i> Book Appointment
+    </a>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card stat-blue">
+      <i class="bi bi-calendar-check stat-icon"></i>
+      <div class="stat-val">{{ upcoming|length }}</div>
+      <div class="stat-lbl">Upcoming</div>
+    </div>
+    <div class="stat-card stat-green">
+      <i class="bi bi-clock-history stat-icon"></i>
+      <div class="stat-val">{{ history|length }}</div>
+      <div class="stat-lbl">Past Visits</div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h3 class="section-title"><i class="bi bi-calendar-week"></i> Upcoming Appointments</h3>
+    {% if upcoming %}
+      <div class="appt-list">
+        {% for u in upcoming %}
+        <div class="appt-card">
+          <div class="appt-date-col">
+            <span class="appt-day">{{ u.date }}</span>
+            <span class="appt-time">{{ u.time }}</span>
+          </div>
+          <div class="appt-info">
+            <span class="appt-doctor"><i class="bi bi-person-badge"></i> Dr. {{ u.doctor.name }}</span>
+            <span class="badge-status badge-upcoming">Scheduled</span>
+          </div>
+          <form method="post" action="{{ url_for('patient_cancel', app_id=u.id) }}" class="appt-action">
+            <button class="btn-cancel" onclick="return confirm('Cancel this appointment?')">
+              <i class="bi bi-x-circle"></i> Cancel
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-calendar-x"></i>
+        <p>No upcoming appointments</p>
+        <a href="{{ url_for('patient_book') }}" class="link-action">Book one now</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="section-block">
+    <h3 class="section-title"><i class="bi bi-clock-history"></i> Visit History</h3>
+    {% if history %}
+      <div class="appt-list">
+        {% for h in history %}
+        <div class="appt-card appt-card--past">
+          <div class="appt-date-col">
+            <span class="appt-day">{{ h.date }}</span>
+          </div>
+          <div class="appt-info">
+            <span class="appt-doctor"><i class="bi bi-person-badge"></i> Dr. {{ h.doctor.name }}</span>
+            <span class="badge-status badge-done">Completed</span>
+          </div>
+          <a href="{{ url_for('view_patient_history', patient_id=current_user.id) }}" class="btn-view">
+            <i class="bi bi-file-text"></i> View
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-clipboard-x"></i>
+        <p>No visit history yet</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

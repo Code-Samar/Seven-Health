@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Book / Reschedule Appointment</h3>
+<form method="post">
+  {{ form.hidden_tag() }}
+  <div class="mb-2">{{ form.doctor_id.label }} {{ form.doctor_id(class="form-select") }}</div>
+  <div class="mb-2">{{ form.date.label }} {{ form.date(class="form-control") }}</div>
+  <div class="mb-2">{{ form.time.label }} {{ form.time(class="form-control") }}</div>
+  <div>{{ form.submit(class="btn btn-success") }}</div>
+</form>
+{% endblock %}

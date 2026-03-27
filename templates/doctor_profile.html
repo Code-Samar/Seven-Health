@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="custom-card">
+      <h3>{{ action }} Doctor</h3>
+
+      {# If rendering DoctorForm (create/edit) #}
+      {% if form.__class__.__name__ == 'DoctorForm' and action in ['Create', 'Edit'] %}
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.username.label(class="form-label") }}
+          {{ form.username(class="form-control") }}
+        </div>
+        <div class="mb-3">
+          {{ form.password.label(class="form-label") }}
+          {{ form.password(class="form-control") }}
+          <small class="form-text text-muted">Leave blank to keep existing password (on edit).</small>
+        </div>
+        <div class="mb-3">
+          {{ form.name.label(class="form-label") }}
+          {{ form.name(class="form-control") }}
+        </div>
+        <div class="mb-3">
+          {{ form.specialization.label(class="form-label") }}
+          {{ form.specialization(class="form-control") }}
+        </div>
+        <div class="mb-3">
+          {{ form.contact.label(class="form-label") }}
+          {{ form.contact(class="form-control") }}
+        </div>
+        <div>
+          {{ form.submit(class="btn btn-success") }}
+          <a href="{{ url_for('admin_dashboard') }}" class="btn btn-soft ms-2">Cancel</a>
+        </div>
+      </form>
+
+      {% else %}
+      {# If rendering AvailabilityForm #}
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.date.label(class="form-label") }}
+          {{ form.date(class="form-control") }}
+        </div>
+        <div class="mb-3 row">
+          <div class="col">
+            {{ form.start_time.label(class="form-label") }}
+            {{ form.start_time(class="form-control") }}
+          </div>
+          <div class="col">
+            {{ form.end_time.label(class="form-label") }}
+            {{ form.end_time(class="form-control") }}
+          </div>
+        </div>
+        <div>
+          {{ form.submit(class="btn btn-primary") }}
+          <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-soft ms-2">Back</a>
+        </div>
+      </form>
+      {% endif %}
+
+    </div>
+
+    {# Optionally show existing availabilities for this doctor #}
+    {% if current_user.is_authenticated and current_user.is_doctor() %}
+    <div class="custom-card mt-3">
+      <h5>Your upcoming availability</h5>
+      <div>
+        {% if availabilities %}
+          {% for av in availabilities[:14] %}
+            <div class="slot slot-free mb-2">
+              {{ av.date.strftime('%Y-%m-%d') }} — {{ av.start_time.strftime('%H:%M') }} to {{ av.end_time.strftime('%H:%M') }}
+              <form method="post" action="{{ url_for('delete_availability', av_id=av.id) }}" style="display:inline;">
+                <button class="btn btn-sm btn-soft">Remove</button>
+              </form>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No availability set yet for the coming days.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

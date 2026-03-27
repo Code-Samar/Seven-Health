@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-icon auth-icon--green">
+        <i class="bi bi-person-plus-fill"></i>
+      </div>
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-subtitle">Register as a patient</p>
+    </div>
+    <form method="post" class="auth-form">
+      {{ form.hidden_tag() }}
+      {% for field in form if field.widget.input_type != 'hidden' and field.name != 'submit' %}
+      <div class="field-group">
+        <label class="field-label">{{ field.label.text }}</label>
+        <div class="field-wrap">
+          {% if 'name' in field.name %}
+            <i class="bi bi-person field-icon"></i>
+          {% elif 'password' in field.name %}
+            <i class="bi bi-lock field-icon"></i>
+          {% elif 'email' in field.name %}
+            <i class="bi bi-envelope field-icon"></i>
+          {% else %}
+            <i class="bi bi-input-cursor-text field-icon"></i>
+          {% endif %}
+          {{ field(class="field-input") }}
+        </div>
+        {% if field.errors %}
+          {% for e in field.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+        {% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn-submit">Register <i class="bi bi-arrow-right"></i></button>
+    </form>
+    <p class="auth-footer">Already registered? <a href="{{ url_for('login') }}">Sign in</a></p>
+  </div>
+</div>
+{% endblock %}
