@@ -5,11 +5,16 @@ from models import db, User, Department, Availability, Appointment, Treatment
 from forms import LoginForm, RegisterPatientForm, DoctorForm, AppointmentForm, AvailabilityForm, TreatmentForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime, timedelta, date, time as time_cls
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    if os.environ.get('VERCEL') and app.config.get('SQLALCHEMY_DATABASE_URI', '').startswith('sqlite:///'):
+        app.logger.error('DATABASE_URL is not set on Vercel. SQLite fallback is enabled and write operations can fail in serverless runtime.')
+
     db.init_app(app)
     login_manager = LoginManager()
     login_manager.login_view = 'login'
@@ -56,18 +61,23 @@ def create_app():
             if User.query.filter_by(username=form.username.data).first():
                 flash('Username exists', 'danger')
             else:
-                u = User(
-                    username=form.username.data,
-                    password_hash=generate_password_hash(form.password.data),
-                    role='patient',
-                    name=form.name.data,
-                    age=form.age.data,
-                    contact=form.contact.data
-                )
-                db.session.add(u)
-                db.session.commit()
-                flash('Registered. Please login', 'success')
-                return redirect(url_for('login'))
+                try:
+                    u = User(
+                        username=form.username.data,
+                        password_hash=generate_password_hash(form.password.data),
+                        role='patient',
+                        name=form.name.data,
+                        age=form.age.data,
+                        contact=form.contact.data
+                    )
+                    db.session.add(u)
+                    db.session.commit()
+                    flash('Registered. Please login', 'success')
+                    return redirect(url_for('login'))
+                except SQLAlchemyError as err:
+                    db.session.rollback()
+                    app.logger.exception('Register patient failed: %s', err)
+                    flash('Could not register patient due to a database error.', 'danger')
         return render_template('register.html', form=form)
 
     # ----------------- Admin routes -----------------
@@ -98,18 +108,23 @@ def create_app():
             if User.query.filter_by(username=form.username.data).first():
                 flash('Username exists', 'danger')
             else:
-                doc = User(
-                    username=form.username.data,
-                    password_hash=generate_password_hash(form.password.data or 'doctorpass'),
-                    role='doctor',
-                    name=form.name.data,
-                    specialization=form.specialization.data,
-                    contact=form.contact.data
-                )
-                db.session.add(doc)
-                db.session.commit()
-                flash('Doctor created', 'success')
-                return redirect(url_for('admin_dashboard'))
+                try:
+                    doc = User(
+                        username=form.username.data,
+                        password_hash=generate_password_hash(form.password.data or 'doctorpass'),
+                        role='doctor',
+                        name=form.name.data,
+                        specialization=form.specialization.data,
+                        contact=form.contact.data
+                    )
+                    db.session.add(doc)
+                    db.session.commit()
+                    flash('Doctor created', 'success')
+                    return redirect(url_for('admin_dashboard'))
+                except SQLAlchemyError as err:
+                    db.session.rollback()
+                    app.logger.exception('Create doctor failed: %s', err)
+                    flash('Could not create doctor due to a database error.', 'danger')
         return render_template('doctor_profile.html', form=form, action='Create')
 
     @app.route('/admin/doctor/<int:doc_id>/edit', methods=['GET','POST'])
